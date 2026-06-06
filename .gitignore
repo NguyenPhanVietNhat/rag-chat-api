@@ -1,0 +1,22 @@
+# Virtual environment
+backend/venv/
+
+# Database & vector store (dữ liệu nhạy cảm)
+backend/chroma_db/
+backend/users.db
+
+# File upload của người dùng
+backend/uploads/
+
+# Biến môi trường (chứa API key, mật khẩu)
+backend/.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Pytest cache
+.pytest_cache/

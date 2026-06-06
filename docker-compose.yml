@@ -1,0 +1,20 @@
+services:
+  backend:
+    build:
+      context: .                        # build từ thư mục root Project1
+      dockerfile: backend/Dockerfile    # Dockerfile nằm trong backend/
+    container_name: docmind
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - docmind_uploads:/app/uploads
+      - docmind_chroma:/app/chroma_db
+      - docmind_db:/app/data
+    restart: unless-stopped
+
+volumes:
+  docmind_uploads:
+  docmind_chroma:
+  docmind_db:

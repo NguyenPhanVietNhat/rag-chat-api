@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DocMind — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#080c14;--surface:#0f1623;--surface2:#131d2e;
+  --border:#1e2d45;--accent:#3b82f6;--accent2:#06b6d4;
+  --text:#e2e8f0;--muted:#64748b;--success:#10b981;--error:#ef4444;--warn:#f59e0b;
+  --sidebar:240px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;overflow:hidden}
+
+.sidebar{width:var(--sidebar);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 16px;overflow-y:auto}
+.logo{display:flex;align-items:center;gap:8px;padding:4px 8px;margin-bottom:24px}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem}
+.logo-text span{color:var(--accent)}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:.88rem;font-weight:500;color:var(--muted);transition:all .18s;text-decoration:none;margin-bottom:4px}
+.nav-btn:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.nav-btn.active{background:rgba(59,130,246,.12);color:var(--accent)}
+.nav-icon{font-size:1rem;width:20px;text-align:center}
+.sidebar-bottom{margin-top:auto;padding-top:16px;border-top:1px solid var(--border)}
+.user-info{display:flex;align-items:center;gap:10px;padding:10px 8px}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0}
+.user-name{font-size:.85rem;font-weight:500}
+.user-role{font-size:.73rem;color:var(--muted)}
+.logout-btn{margin-top:8px;width:100%;padding:8px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.83rem;cursor:pointer;transition:all .2s}
+.logout-btn:hover{border-color:var(--error);color:#f87171}
+
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{padding:16px 28px;border-bottom:1px solid var(--border);background:rgba(8,12,20,.8);backdrop-filter:blur(10px);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.topbar-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem}
+.topbar-sub{font-size:.82rem;color:var(--muted);margin-top:3px}
+
+/* TABS */
+.tab-bar{display:flex;gap:4px;padding:16px 28px 0;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.tab-btn{padding:10px 20px;border:none;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;margin-bottom:-1px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+.content{flex:1;overflow-y:auto;padding:28px 32px}
+.content::-webkit-scrollbar{width:5px}
+.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:32px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;transition:border-color .2s}
+.stat-card:hover{border-color:rgba(59,130,246,.3)}
+.stat-val{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;margin-bottom:4px}
+.stat-label{font-size:.8rem;color:var(--muted)}
+.stat-card.blue .stat-val{color:var(--accent)}
+.stat-card.teal .stat-val{color:var(--accent2)}
+.stat-card.green .stat-val{color:var(--success)}
+.stat-card.warn .stat-val{color:var(--warn)}
+
+/* TABLE */
+.table-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.table-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem}
+.refresh-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:.82rem;font-family:'DM Sans',sans-serif;transition:all .2s}
+.refresh-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--surface2)}
+th{padding:12px 16px;text-align:left;font-size:.78rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+td{padding:13px 16px;font-size:.88rem;border-bottom:1px solid rgba(30,45,69,.6)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:.75rem;font-weight:500;padding:3px 10px;border-radius:20px}
+.badge.admin{background:rgba(59,130,246,.12);color:#93c5fd;border:1px solid rgba(59,130,246,.2)}
+.badge.user{background:rgba(148,163,184,.08);color:var(--muted);border:1px solid var(--border)}
+.badge.approved{background:rgba(16,185,129,.12);color:#6ee7b7;border:1px solid rgba(16,185,129,.2)}
+.badge.pending{background:rgba(245,158,11,.12);color:#fcd34d;border:1px solid rgba(245,158,11,.2)}
+
+.action-btns{display:flex;gap:6px}
+.act-btn{padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.78rem;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif}
+.act-btn.approve{border-color:rgba(16,185,129,.4);color:#6ee7b7}
+.act-btn.approve:hover{background:rgba(16,185,129,.12)}
+.act-btn.revoke{border-color:rgba(245,158,11,.4);color:#fcd34d}
+.act-btn.revoke:hover{background:rgba(245,158,11,.12)}
+.act-btn.delete{border-color:rgba(239,68,68,.3);color:#fca5a5}
+.act-btn.delete:hover{background:rgba(239,68,68,.12)}
+.act-btn.role{border-color:rgba(167,139,250,.4);color:#c4b5fd}
+.act-btn.role:hover{background:rgba(167,139,250,.12)}
+
+.empty-row td{text-align:center;color:var(--muted);padding:32px}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:28px;right:28px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:12px 18px;font-size:.87rem;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+  animation:toastIn .3s cubic-bezier(.16,1,.3,1);
+  z-index:999;display:none;
+}
+.toast.show{display:block}
+.toast.success{border-color:rgba(16,185,129,.4);color:#6ee7b7}
+.toast.error{border-color:rgba(239,68,68,.3);color:#fca5a5}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">📄</div>
+    <div class="logo-text">Doc<span>Mind</span></div>
+  </div>
+  <a href="chat.html"   class="nav-btn"><span class="nav-icon">💬</span>Chat</a>
+  <a href="upload.html" class="nav-btn"><span class="nav-icon">📤</span>Upload tài liệu</a>
+  <a href="admin.html"  class="nav-btn active"><span class="nav-icon">⚙️</span>Quản trị</a>
+  <div class="sidebar-bottom">
+    <div class="user-info">
+      <div class="avatar" id="avatar-text">A</div>
+      <div>
+        <div class="user-name" id="uname">Admin</div>
+        <div class="user-role">admin</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">⚙️ Quản trị hệ thống</div>
+      <div class="topbar-sub">Quản lý người dùng và tài liệu toàn hệ thống</div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('users')">👥 Người dùng</button>
+    <button class="tab-btn"        onclick="switchTab('docs')">📚 Tài liệu</button>
+  </div>
+
+  <div class="content">
+    <!-- STATS -->
+    <div class="stats" id="stats">
+      <div class="stat-card blue"><div class="stat-val" id="s-total">—</div><div class="stat-label">Tổng người dùng</div></div>
+      <div class="stat-card warn"><div class="stat-val" id="s-pending">—</div><div class="stat-label">Chờ phê duyệt</div></div>
+      <div class="stat-card teal"><div class="stat-val" id="s-docs">—</div><div class="stat-label">Tài liệu đã index</div></div>
+    </div>
+
+    <!-- USERS TAB -->
+    <div id="tab-users">
+      <div class="table-header">
+        <div class="table-title">Danh sách người dùng</div>
+        <button class="refresh-btn" onclick="loadUsers()">↻ Làm mới</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Người dùng</th><th>User ID</th><th>Vai trò</th><th>Trạng thái</th><th>Ngày tạo</th><th>Hành động</th>
+          </tr></thead>
+          <tbody id="users-tbody"><tr class="empty-row"><td colspan="6">Đang tải...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DOCS TAB -->
+    <div id="tab-docs" style="display:none">
+      <div class="table-header">
+        <div class="table-title">Tất cả tài liệu hệ thống</div>
+        <button class="refresh-btn" onclick="loadAllDocs()">↻ Làm mới</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Tên file</th><th>Loại</th><th>Thuộc user</th><th>Ngày tạo</th><th>Hành động</th>
+          </tr></thead>
+          <tbody id="docs-tbody"><tr class="empty-row"><td colspan="5">Đang tải...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:8000';
+let token = localStorage.getItem('token');
+const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+if (!token || user.role !== 'admin') window.location.href = 'index.html';
+
+document.getElementById('uname').textContent = user.username || 'Admin';
+document.getElementById('avatar-text').textContent = (user.username||'A')[0].toUpperCase();
+function logout(){ localStorage.clear(); window.location.href='index.html'; }
+function headers(){ return { 'Authorization': `Bearer ${token}`, 'Content-Type':'application/json' }; }
+
+function showToast(msg, type='success'){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = `toast show ${type}`;
+  setTimeout(()=>el.className='toast', 2800);
+}
+
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='users')||(i===1&&tab==='docs')));
+  document.getElementById('tab-users').style.display = tab==='users' ? '' : 'none';
+  document.getElementById('tab-docs').style.display  = tab==='docs'  ? '' : 'none';
+  if(tab==='docs') loadAllDocs();
+}
+
+async function loadUsers(){
+  const tbody = document.getElementById('users-tbody');
+  tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Đang tải...</td></tr>';
+  try{
+    const res = await fetch(`${API}/admin/users`, { headers: headers() });
+    const data = await res.json();
+    const users = data.users || [];
+    document.getElementById('s-total').textContent = users.length;
+    document.getElementById('s-pending').textContent = users.filter(u=>!u.is_approved && u.role!=='admin').length;
+
+    if(!users.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="6">Chưa có người dùng</td></tr>'; return; }
+
+    tbody.innerHTML = users.map(u => `
+      <tr>
+        <td><div style="font-weight:500">${u.full_name||u.username}</div><div style="font-size:.75rem;color:var(--muted)">@${u.username}</div></td>
+        <td style="font-family:monospace;font-size:.78rem;color:var(--muted)">${u.user_id||'—'}</td>
+        <td><span class="badge ${u.role}">${u.role==='admin'?'👑 Admin':'👤 User'}</span></td>
+        <td><span class="badge ${u.is_approved?'approved':'pending'}">${u.is_approved?'✓ Đã duyệt':'⏳ Chờ duyệt'}</span></td>
+        <td style="color:var(--muted);font-size:.8rem">${u.created_at ? new Date(u.created_at).toLocaleDateString('vi-VN') : '—'}</td>
+        <td>
+          ${u.role!=='admin' ? `
+          <div class="action-btns">
+            ${!u.is_approved ? `<button class="act-btn approve" onclick="approveUser('${u.username}')">✓ Duyệt</button>` : `<button class="act-btn revoke" onclick="revokeUser('${u.username}')">✕ Thu hồi</button>`}
+            <button class="act-btn role" onclick="changeRole('${u.username}','${u.role}')" title="Đổi role">${u.role==='user'?'⬆ Lên Admin':'⬇ Về User'}</button>
+            <button class="act-btn delete" onclick="deleteUser('${u.username}')">🗑</button>
+          </div>` : '<span style="color:var(--muted);font-size:.78rem">—</span>'}
+        </td>
+      </tr>`).join('');
+  } catch(e){
+    tbody.innerHTML=`<tr class="empty-row"><td colspan="6">Lỗi: ${e.message}</td></tr>`;
+  }
+}
+
+async function changeRole(username, currentRole){
+  const newRole = currentRole === 'user' ? 'admin' : 'user';
+  const msg = newRole === 'admin'
+    ? `Bạn có chắc muốn cấp quyền Admin cho @${username}?\n\n⚠️ Lưu ý: Tài khoản Admin sẽ không thể bị xoá bởi Admin khác.`
+    : `Bạn có chắc muốn hạ quyền @${username} về User?`;
+  if(!confirm(msg)) return;
+  try{
+    const res = await fetch(`${API}/admin/users/${username}/role`, { method:'POST', headers:headers() });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.detail);
+    showToast(`✓ ${data.message}`);
+    loadUsers();
+  } catch(e){ showToast(e.message, 'error'); }
+}
+
+async function approveUser(username){
+  try{
+    const res = await fetch(`${API}/admin/users/${username}/approve`, { method:'POST', headers:headers() });
+    if(!res.ok) throw new Error((await res.json()).detail);
+    showToast(`✓ Đã phê duyệt @${username}`);
+    loadUsers();
+  } catch(e){ showToast(e.message, 'error'); }
+}
+
+async function revokeUser(username){
+  if(!confirm(`Thu hồi quyền của @${username}?`)) return;
+  try{
+    const res = await fetch(`${API}/admin/users/${username}/revoke`, { method:'POST', headers:headers() });
+    if(!res.ok) throw new Error((await res.json()).detail);
+    showToast(`Đã thu hồi quyền @${username}`, 'error');
+    loadUsers();
+  } catch(e){ showToast(e.message, 'error'); }
+}
+
+async function deleteUser(username){
+  if(!confirm(`Xoá vĩnh viễn tài khoản @${username}?`)) return;
+  try{
+    const res = await fetch(`${API}/admin/users/${username}`, { method:'DELETE', headers:headers() });
+    if(!res.ok) throw new Error((await res.json()).detail);
+    showToast(`Đã xoá @${username}`, 'error');
+    loadUsers();
+  } catch(e){ showToast(e.message, 'error'); }
+}
+
+async function loadAllDocs(){
+  const tbody = document.getElementById('docs-tbody');
+  tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Đang tải...</td></tr>';
+  try{
+    const res = await fetch(`${API}/admin/docs`, { headers:headers() });
+    const data = await res.json();
+    const docs = data.documents || [];
+    document.getElementById('s-docs').textContent = docs.length;
+
+    if(!docs.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="5">Chưa có tài liệu nào</td></tr>'; return; }
+    tbody.innerHTML = docs.map(d => `
+      <tr>
+        <td><div style="font-weight:500;word-break:break-all">${d.source_file}</div><div style="font-family:monospace;font-size:.72rem;color:var(--muted)">${d.doc_id}</div></td>
+        <td><span class="badge user">${d.doc_type||'doc'}</span></td>
+        <td style="color:var(--muted);font-size:.82rem">@${d.user_id||'—'}</td>
+        <td style="color:var(--muted);font-size:.8rem">${d.created_at ? new Date(d.created_at).toLocaleDateString('vi-VN') : '—'}</td>
+        <td><button class="act-btn delete" onclick="deleteDoc('${d.doc_id}','${d.source_file}')">🗑 Xoá</button></td>
+      </tr>`).join('');
+  } catch(e){
+    tbody.innerHTML=`<tr class="empty-row"><td colspan="5">Lỗi: ${e.message}</td></tr>`;
+  }
+}
+
+async function deleteDoc(docId, name){
+  if(!confirm(`Xoá tài liệu "${name}"?`)) return;
+  try{
+    await fetch(`${API}/admin/docs/${docId}`, { method:'DELETE', headers:headers() });
+    showToast(`Đã xoá "${name}"`, 'error');
+    loadAllDocs();
+  } catch(e){ showToast(e.message,'error'); }
+}
+
+// Init
+loadUsers();
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+# ── Web Framework ─────────────────────────────────────────────────────────────
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+python-multipart==0.0.9        # upload file
+
+# ── AI / LLM ──────────────────────────────────────────────────────────────────
+openai==1.82.0
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.12.0+cpu
+sentence-transformers==2.7.0
+transformers==4.57.6
+langchain-text-splitters==0.3.0
+
+# ── Vector Database ───────────────────────────────────────────────────────────
+chromadb==1.5.9
+
+# ── Document Processing ───────────────────────────────────────────────────────
+pypdf==4.3.1                   # đọc PDF
+pdfplumber==0.11.4             # trích xuất bảng trong PDF
+python-docx==1.1.2             # đọc DOCX
+openpyxl==3.1.5                # đọc XLSX
+tiktoken==0.8.0                # đếm token
+
+# ── Auth & Security ───────────────────────────────────────────────────────────
+bcrypt==4.2.0
+
+# ── Config ────────────────────────────────────────────────────────────────────
+python-dotenv==1.0.1
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+numpy==1.26.4
+pydantic==2.9.2

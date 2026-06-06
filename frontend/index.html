@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DocMind — Đăng nhập</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:        #080c14;
+  --surface:   #0f1623;
+  --border:    #1e2d45;
+  --accent:    #3b82f6;
+  --accent2:   #06b6d4;
+  --text:      #e2e8f0;
+  --muted:     #64748b;
+  --success:   #10b981;
+  --error:     #ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+
+/* animated bg */
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(59,130,246,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
+.bg-orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none}
+.bg-orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(59,130,246,.15),transparent 70%);top:-100px;right:-100px;animation:float1 8s ease-in-out infinite}
+.bg-orb2{width:400px;height:400px;background:radial-gradient(circle,rgba(6,182,212,.10),transparent 70%);bottom:-80px;left:-80px;animation:float2 10s ease-in-out infinite}
+@keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,30px)}}
+@keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-20px)}}
+
+.card{
+  position:relative;z-index:1;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:48px 44px;
+  width:100%;max-width:440px;
+  box-shadow:0 0 0 1px rgba(59,130,246,.08),0 32px 64px rgba(0,0,0,.5);
+  animation:slideUp .5s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:32px}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;letter-spacing:-.5px}
+.logo-text span{color:var(--accent)}
+
+.tabs{display:flex;background:rgba(255,255,255,.04);border-radius:10px;padding:4px;margin-bottom:28px;gap:4px}
+.tab{flex:1;padding:9px;text-align:center;border-radius:7px;cursor:pointer;font-size:.88rem;font-weight:500;color:var(--muted);transition:all .2s}
+.tab.active{background:var(--accent);color:#fff;box-shadow:0 2px 12px rgba(59,130,246,.4)}
+
+.form-group{margin-bottom:18px}
+label{display:block;font-size:.82rem;font-weight:500;color:var(--muted);margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px}
+input{
+  width:100%;padding:12px 16px;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);
+  border-radius:10px;
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:.95rem;
+  transition:border-color .2s,box-shadow .2s;
+  outline:none;
+}
+input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+input::placeholder{color:var(--muted)}
+
+.btn{
+  width:100%;padding:13px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:10px;
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;
+  cursor:pointer;margin-top:8px;
+  transition:opacity .2s,transform .1s;
+  position:relative;overflow:hidden;
+}
+.btn:hover{opacity:.9}
+.btn:active{transform:scale(.99)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-loading::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);animation:shimmer 1.2s infinite}
+@keyframes shimmer{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+
+.alert{padding:12px 16px;border-radius:10px;font-size:.88rem;margin-bottom:16px;display:none}
+.alert.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
+.alert.success{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:#6ee7b7}
+.alert.show{display:block}
+
+.divider{text-align:center;color:var(--muted);font-size:.8rem;margin:16px 0;position:relative}
+.divider::before,.divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border)}
+.divider::before{left:0}.divider::after{right:0}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-orb bg-orb1"></div>
+<div class="bg-orb bg-orb2"></div>
+
+<div class="card">
+  <div class="logo">
+    <div class="logo-icon">📄</div>
+    <div class="logo-text">Doc<span>Mind</span></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('login')">Đăng nhập</div>
+    <div class="tab" onclick="switchTab('register')">Đăng ký</div>
+  </div>
+
+  <div id="alert" class="alert"></div>
+
+  <!-- LOGIN -->
+  <div id="form-login">
+    <div class="form-group">
+      <label>Tên đăng nhập</label>
+      <input type="text" id="login-user" placeholder="username" autocomplete="username"/>
+    </div>
+    <div class="form-group">
+      <label>Mật khẩu</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/>
+    </div>
+    <button class="btn" id="btn-login" onclick="doLogin()">Đăng nhập</button>
+  </div>
+
+  <!-- REGISTER -->
+  <div id="form-register" style="display:none">
+    <div class="form-group">
+      <label>Họ và tên</label>
+      <input type="text" id="reg-name" placeholder="Nguyễn Văn A"/>
+    </div>
+    <div class="form-group">
+      <label>Tên đăng nhập</label>
+      <input type="text" id="reg-user" placeholder="username"/>
+    </div>
+    <div class="form-group">
+      <label>Mật khẩu</label>
+      <input type="password" id="reg-pass" placeholder="Tối thiểu 6 ký tự"/>
+    </div>
+    <button class="btn" id="btn-register" onclick="doRegister()">Tạo tài khoản</button>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:8000';
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
+  document.getElementById('form-login').style.display    = tab==='login'    ? '' : 'none';
+  document.getElementById('form-register').style.display = tab==='register' ? '' : 'none';
+  hideAlert();
+}
+
+function showAlert(msg, type='error') {
+  const el = document.getElementById('alert');
+  el.textContent = msg; el.className = `alert ${type} show`;
+}
+function hideAlert() {
+  document.getElementById('alert').className = 'alert';
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.classList.toggle('btn-loading', loading);
+}
+
+async function doLogin() {
+  const user = document.getElementById('login-user').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  if (!user || !pass) return showAlert('Vui lòng nhập đầy đủ thông tin');
+  setLoading('btn-login', true);
+  try {
+    const fd = new FormData();
+    fd.append('username', user); fd.append('password', pass);
+    const res = await fetch(`${API}/auth/login`, {method:'POST', body:fd});
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Đăng nhập thất bại');
+    localStorage.setItem('token', data.access_token);
+    localStorage.setItem('user', JSON.stringify({username:data.username, role:data.role, user_id:data.user_id}));
+    showAlert('Đăng nhập thành công! Đang chuyển hướng...', 'success');
+    setTimeout(() => { window.location.href = data.role === 'admin' ? 'admin.html' : 'chat.html'; }, 800);
+  } catch(e) { showAlert(e.message); }
+  finally { setLoading('btn-login', false); }
+}
+
+async function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const user = document.getElementById('reg-user').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  if (!user || !pass) return showAlert('Vui lòng nhập đầy đủ thông tin');
+  if (pass.length < 6) return showAlert('Mật khẩu phải ít nhất 6 ký tự');
+  setLoading('btn-register', true);
+  try {
+    const res = await fetch(`${API}/auth/register`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({username:user, password:pass, full_name:name})
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Đăng ký thất bại');
+    if (!data.is_approved) {
+      showAlert('Đăng ký thành công! Chờ admin phê duyệt để đăng nhập.', 'success');
+    } else {
+      localStorage.setItem('token', data.access_token);
+      localStorage.setItem('user', JSON.stringify({username:data.username, role:data.role}));
+      showAlert('Đăng ký thành công!', 'success');
+      setTimeout(() => { window.location.href = 'chat.html'; }, 800);
+    }
+  } catch(e) { showAlert(e.message); }
+  finally { setLoading('btn-register', false); }
+}
+
+// Enter key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('form-login').style.display !== 'none') doLogin();
+    else doRegister();
+  }
+});
+
+// Redirect nếu đã login
+if (localStorage.getItem('token')) {
+  const u = JSON.parse(localStorage.getItem('user') || '{}');
+  window.location.href = u.role === 'admin' ? 'admin.html' : 'chat.html';
+}
+</script>
+</body>
+</html>

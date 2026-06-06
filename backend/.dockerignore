@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+*.egg-info/
+
+# Data (mount bằng volume, không copy vào image)
+uploads/
+chroma_db/
+users.db
+users.json
+users.json.bak
+
+# Dev files
+.env
+*.bak
+migrate_to_sqlite.py
+test_*.py
+
+# VS Code
+.vscode/
+
+# Git
+.git/
+.gitignore
